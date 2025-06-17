@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pallet Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 400px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        input {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        button {
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button#calculate {
+            background-color: #28a745;
+            color: #fff;
+        }
+
+        button#clear {
+            background-color: #dc3545;
+            color: #fff;
+        }
+
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #f8f9fa;
+        }
+
+        .highlight {
+            background-color: #d4edda;
+            font-weight: bold;
+        }
+
+        .check-mark {
+            color: green;
+            font-weight: bold;
+        }
+        .button {
+          display: inline-block;
+          padding: 10px 20px;
+          background-color: #4CAF50;
+          color: white;
+          text-decoration: none;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+          font-size: 16px;
+        }
+
+        .button:hover {
+          background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Maximum Express </br>Pallets Calculator</h1>
+        <form id="calculator-form">
+            <label for="totalWeight">Total Weight (lbs):</label>
+            <input type="number" id="totalWeight" name="totalWeight" min="1" required>
+
+            <label>
+                <input type="checkbox" id="tailgateRequired">
+                Tailgate required
+            </label>
+
+            <div class="buttons">
+                <button type="button" id="calculate">Calculate</button>
+                <button type="button" id="clear">Clear</button>
+            </div>
+        </form>
+
+        <table id="resultTable">
+            <thead>
+                <tr>
+                    <th>Pallets</th>
+                    <th>Total Cost ($)</th>
+                    <th>Best Option</th>
+                </tr>
+            </thead>
+            <tbody id="results"></tbody>
+        </table>
+      </br>
+        <a href="Weight Calculator.html" class="button">Go to Weight Sheet</a>
+        <h6>Gerhards Importers Canada </br>V 1.0 2024-07-01</h6>
+    </div>
+    <script>
+        document.getElementById('calculate').addEventListener('click', calculate);
+        document.getElementById('clear').addEventListener('click', clearForm);
+        document.getElementById('tailgateRequired').addEventListener('change', calculate);
+        document.addEventListener('keydown', function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                calculate();
+            }
+            if (event.key === "Escape") {
+                clearForm();
+            }
+        });
+
+        function calculate() {
+            const totalWeight = parseInt(document.getElementById('totalWeight').value);
+            const tailgateRequired = document.getElementById('tailgateRequired').checked;
+            if (!totalWeight || totalWeight <= 0) return;
+
+            const costPerPallet = 110;
+            const extraPoundCost = 0.12;
+            const maxLoadPerPallet = tailgateRequired ? 1500 : 2500;
+            const fullPalletWeight = 1500;
+
+            let results = [];
+
+            for (let i = 1; i <= Math.ceil(totalWeight / fullPalletWeight); i++) {
+                let pallets = i;
+                let remainingWeight = totalWeight - pallets * fullPalletWeight;
+                if (remainingWeight < 0) remainingWeight = 0;
+                let totalCost = pallets * costPerPallet + remainingWeight * extraPoundCost;
+
+                let maxCost = pallets * 230;
+                let displayCost = totalCost > maxCost ? "N/A" : totalCost.toFixed(2);
+                results.push({ pallets, totalCost: displayCost });
+            }
+
+            displayResults(results, tailgateRequired);
+        }
+
+        function displayResults(results, tailgateRequired) {
+            const resultsTable = document.getElementById('results');
+            resultsTable.innerHTML = '';
+
+            let validResults = results.filter(result => result.totalCost !== "N/A").map(result => parseFloat(result.totalCost));
+            let minCost = Math.min(...validResults);
+
+            let bestIndex = results.findIndex(result => parseFloat(result.totalCost) === minCost);
+            if (tailgateRequired && bestIndex < results.length - 1) {
+                bestIndex += 1;
+            }
+
+            results.forEach((result, index) => {
+                const row = document.createElement('tr');
+                const palletCell = document.createElement('td');
+                const costCell = document.createElement('td');
+                const bestOptionCell = document.createElement('td');
+
+                palletCell.textContent = result.pallets;
+                costCell.textContent = result.totalCost;
+
+                if (index === bestIndex) {
+                    row.classList.add('highlight');
+                    bestOptionCell.textContent = '✔';
+                    bestOptionCell.classList.add('check-mark');
+                }
+
+                row.appendChild(palletCell);
+                row.appendChild(costCell);
+                row.appendChild(bestOptionCell);
+                resultsTable.appendChild(row);
+            });
+        }
+
+        function clearForm() {
+            document.getElementById('totalWeight').value = '';
+            document.getElementById('tailgateRequired').checked = false;
+            document.getElementById('results').innerHTML = '';
+        }
+    </script>
+</body>
+</html>

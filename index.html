@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚚 Weight Chart</title>
+    <!-- Include Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha512-EXAMPLEHASH" crossorigin="anonymous" />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        h1, h2 {
+            text-align: left;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 4px; /* Reduced padding for height adjustment */
+            text-align: left;
+            height: 26px; /* Reduced height by 50% */
+        }
+
+        th {
+            background-color: #f2f2f2;
+            position: sticky;
+            top: 0;
+            z-index: 2;
+        }
+
+        td:first-child {
+            text-align: center;
+        }
+
+
+        .quantity-input {
+            font-size: 1.25em;
+            width: 50%; /* Adjusted width for Quantity Cases */
+        }
+
+        .quantity-input-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .quantity-action-button {
+            margin-left: 5px;
+            padding: 5px 10px;
+            font-size: 12px;
+            cursor: pointer;
+            background-color: #45a049;
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+
+        .quantity-action-button:hover {
+            background-color: #cc0000;
+        }
+
+        tr:hover {
+            background-color: #45a049;
+        }
+
+        .totals {
+            margin-top: 10px;
+            text-align: left; /* Align totals section to the left */
+        }
+
+        button {
+            display: block;
+            margin: 20px 0 20px 20px; /* Adjusted margin for left alignment */
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: box-shadow 0.3s ease; /* Adding transition for smooth effect */
+        }
+
+        button:hover {
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.9); /* Glow effect on hover */
+        }
+
+        .highlight-yellow {
+            background-color: yellow;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .button:hover {
+            background-color: #45a049;
+        }
+
+        .clear-icon {
+            cursor: pointer;
+            margin-left: 15px;
+            color: red; /* Red color for the X icon */
+
+        }
+
+        .clear-icon:hover {
+            color: darkred; /* Darker red color on hover */
+        }
+        .fas.fa-weight-hanging {
+        margin-left: 5px;
+        color: #555;
+        /* Add any other styles here */
+    }
+    </style>
+
+
+  </head> <body> <h6>Gerhards Importers Canada </br> V 2.6 2025-03-17</h6> <a href="PalletsCalc.html" class="button">Go to Max Express Calculator</a> <h1>Weight Calculation Chart</h1> <table id="productTable">
+     <table id="productTable">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Product/Group</th>
+                <th>Length (in)</th>
+                <th>Width (in)</th>
+                <th>Height (in)</th>
+                <th>Weight (lb)</th>
+                <th>Full Pallet</th>
+                <th>Quantity Cases</th>
+                <th>Pallets</th>
+            </tr>
+        </thead>
+          <tbody>
+              <tr>
+                <td class="product">Product 1</td>
+                <td class="length">10</td>
+                <td class="width">20</td>
+                <td class="height">15</td>
+                <td class="weight">5</td>
+                <td class="cases-per-pallet">50</td>
+                <td class="quantity"><input type="number" min="0"></td>
+            </tr>
+              </tbody>
+      </table>
+
+    <div class="totals">
+        <h2>Overall Totals/Summary</h2>
+        <p>Total Weight (lb): <span id="totalWeight">0</span></p>
+        <p>Total Cases: <span id="totalCases">0</span></p>
+        <p>Total Pallets: <span id="numPallets">0</span></p>
+        <p>Total Kilograms (kg): <span id="totalKilograms">0</span></p>
+        <label for="palletSelect">Select Pallet:</label>
+        <select id="palletSelect">
+            <option value="" selected></option>
+            <option value="chep">CHEP Pallet</option>
+            <option value="regular">Regular Pallet</option>
+        </select>
+    </div>
+
+    <button id="clearQuantities">Clear Quantities</button>
+
+    <script>
+        const products = [
+          { Product: "Pacific Almond (Edgepack) [12 x 32 oz]", Length: 8.5, Width: 11.9, Height: 9.2, Weight: 27, FullPallet: 80 },
+          { Product: "Pacific (all except Edgepack) [12 x 32 oz]", Length: 8.85, Width: 14.7, Height: 7.9, Weight: 28, FullPallet: 75 },
+          { Product: "Say When [12 x 32oz]", Length: 7.75, Width: 14.5, Height: 8, Weight: 29.8, FullPallet: 75 },
+          { Product: "Sproud [6 x 33.8 oz (1L)]", Length: 9, Width: 6.5, Height: 8.5, Weight: 14, FullPallet: 155 },
+          { Product: "Milkadamia [6 x 32 oz]", Length: 7.75, Width: 7.56, Height: 8.63, Weight: 13.6, FullPallet: 150 },
+	  { Product: "Milkadamia [12 x 32 oz]", Length: 14.62, Width: 7.81, Height: 8.68, Weight: 26.51, FullPallet: 75 },
+          { Product: "Kohana [6 x 32 oz]", Length: 11, Width: 8, Height: 8, Weight: 8, FullPallet: 140 },
+          { Product: "1883 Syrup - GLASS [6 x 1L Glass]", Length: 8.5, Width: 6.3, Height: 12.8, Weight: 23.8, FullPallet: 90 },
+          { Product: "1883 Syrup - PET [6 x 1L PET]", Length: 9.6, Width: 6.4, Height: 12.2, Weight: 18.1, FullPallet: 90 },
+          { Product: "1883 PET Sugar Free [6 x 1L PET]", Length: 9.5, Width: 6.3, Height: 12.8, Weight: 14.8, FullPallet: 90 },
+          { Product: "1883 FRAPPE [6 x 1L PET]", Length: 9.5, Width: 6.3, Height: 12.8, Weight: 14.3, FullPallet: 90 },
+          { Product: "1883 Sauce [2 x 1.89 L]", Length: 9, Width: 5.5, Height: 10.2, Weight: 11.6, FullPallet: 136 },
+          { Product: "1883 Sauce [6 x 500 mL]", Length: 8.3, Width: 5.7, Height: 10.3, Weight: 9.4, FullPallet: 148 },
+          { Product: "1883 Syrup [2 x 1L Glass]", Length: 3, Width: 6, Height: 13, Weight: 8, FullPallet: 210 },
+          { Product: "1883 Syrup [2 x 1L PET]", Length: 3, Width: 6, Height: 13, Weight: 6, FullPallet: 210 },
+          { Product: "1883 Smoothies [8 x 1L]", Length: 12, Width: 6, Height: 9, Weight: 20.1, FullPallet: 92 },
+          { Product: "1883 Puree [6 x 900 ml]", Length: 7.8, Width: 5.9, Height: 9.1, Weight: 16.8, FullPallet: 120 },
+          { Product: "1883 Puree [6 x 1L]", Length: 12, Width: 8, Height: 12, Weight: 17.8, FullPallet: 60 },
+          { Product: "1883 Syrup [12 x 250 mL]", Length: 7.76, Width: 5.9, Height: 9.13, Weight: 16.1, FullPallet: 140 },
+          { Product: "1883 Syrup [20 x 65 mL ]", Length: 7, Width: 5.5, Height: 5.75, Weight: 8.6, FullPallet: 160 },
+          { Product: "Alchemy [6 x 750 mL]", Length: 9, Width: 6, Height: 10, Weight: 13, FullPallet: 180 },
+          { Product: "Hollander Sauce [6x64oz]", Length: 6, Width: 10.5, Height: 10.5, Weight: 36, FullPallet: 40 },
+          { Product: "Hollander Sauce [12x15 oz]", Length: 15, Width: 8, Height: 8, Weight: 16.5, FullPallet: 100 },
+          { Product: "Hollander Dry [10x2.5 lbs]", Length: 12, Width: 12, Height: 11.5, Weight: 26.25, FullPallet: 64 },
+          { Product: "Hollander Dry [10x1.5 lbs]", Length: 12, Width: 10, Height: 12, Weight: 15.75, FullPallet: 64 },
+          { Product: "Cappucinne [5 x 3Lb]", Length: 11.37, Width: 7.37, Height: 10, Weight: 15.98, FullPallet: 100 },
+          { Product: "Cappucinne [8 x 10ct]", Length: 12.3, Width: 8.5, Height: 6.6, Weight: 1, FullPallet: 96 },
+          { Product: "Smartfruit [6 x 48oz]", Length: 11.56, Width: 7.75, Height: 10.62, Weight: 25, FullPallet: 80 },
+          { Product: "Mountain Cider [4 x 0.5 gal]", Length: 1.5, Width: 10.5, Height: 9, Weight: 25, FullPallet: 60 },
+          { Product: "Mountain Cider [12 x 16 oz]", Length: 13.5, Width: 10.75, Height: 6, Weight: 18.2, FullPallet: 45 },
+          { Product: "Aiya Matcha [8 x 1 kg]", Length: 11.25, Width: 8.5, Height: 10.75, Weight: 19, FullPallet: 90 },
+          { Product: "Aiya Matcha [4 x 1 kg]", Length: 7, Width: 9.5, Height: 6.25, Weight: 10, FullPallet: 130 },
+          { Product: "Aiya Matcha [12 x 100 g]", Length: 11.75, Width: 9.25, Height: 7.75, Weight: 8, FullPallet: 100 },
+          { Product: "Aiya Matcha [4 x 1 kg]", Length: 7, Width: 9.5, Height: 6.25, Weight: 10, FullPallet: 130 },
+          { Product: "Aiya Matcha [8 x 30g ]", Length: 7, Width: 4.75, Height: 3.5, Weight: 1.1, FullPallet: 200 },
+          { Product: "Numi Tea [6 x 18ct]", Length: 8.25, Width: 7, Height: 6, Weight: 1.4, FullPallet: 350 },
+          { Product: "Numi Tea 100ct [100ct]", Length: 8.25, Width: 7, Height: 6, Weight: 1.7, FullPallet: 350 },
+          { Product: "Numi Iced Tea [24 x 2 oz]", Length: 9, Width: 7, Height: 7, Weight: 3.6, FullPallet: 150 },
+          { Product: "Numi Looseleaf Tea [6 x 1 lb]", Length: 6.5, Width: 3.5, Height: 11.5, Weight: 6, FullPallet: 100 },
+          { Product: "Smith Teamaker [1lb Bag]", Length: 8, Width: 8, Height: 5, Weight: 1.4, FullPallet: 100 },
+          { Product: "Smith Teamaker [6 x 15/100ct/2 x 50ct]", Length: 15, Width: 6.25, Height: 5.25, Weight: 1.6, FullPallet: 140 },
+          { Product: "Smith Teamaker [12 x 3gl]", Length: 12.25, Width: 8, Height: 5, Weight: 2.5, FullPallet: 140 },
+          { Product: "Smith Teamaker [50 x 1 gal]", Length: 15.38, Width: 9.37, Height: 8.75, Weight: 5.24, FullPallet: 140 },
+          { Product: "1883 racks (all)[Ind.]", Length: 1.0, Width: 1.0, Height: 1.0, Weight: 1.4, FullPallet: 1000 },
+          { Product: "All/Any Pumps", Length: 1.0, Width: 1.0, Height: 1.0, Weight: 0.1, FullPallet: 1000 },
+        ];
+
+        function renderTable() {
+            const tbody = document.querySelector("#productTable tbody");
+            tbody.innerHTML = "";
+            products.forEach((product, index) => {
+                const row = document.createElement("tr");
+
+                const productNumber = document.createElement("td");
+                productNumber.textContent = index + 1;
+                row.appendChild(productNumber);
+
+                Object.keys(product).forEach(key => {
+                    const cell = document.createElement("td");
+                    cell.textContent = product[key];
+                    row.appendChild(cell);
+                });
+
+                const quantityCell = document.createElement("td");
+                quantityCell.className = "quantity-input-container";
+
+                const quantityInput = document.createElement("input");
+                quantityInput.type = "number";
+                quantityInput.className = "quantity-input";
+                quantityInput.value = 0;
+                quantityInput.min = 0;
+                quantityInput.addEventListener("input", calculateTotals);
+
+                const clearButton = document.createElement("span");
+                clearButton.className = "clear-icon";
+                clearButton.innerHTML = "&times;";
+                clearButton.addEventListener("click", () => {
+                    quantityInput.value = 0;
+                    calculateTotals();
+                });
+
+                quantityCell.appendChild(quantityInput);
+                quantityCell.appendChild(clearButton);
+                row.appendChild(quantityCell);
+
+                const palletsCell = document.createElement("td");
+                palletsCell.textContent = 0;
+                row.appendChild(palletsCell);
+
+                tbody.appendChild(row);
+            });
+        }
+
+        function calculateTotals() {
+            let totalWeight = 0;
+            let totalCases = 0;
+            let totalPallets = 0;
+
+            const rows = document.querySelectorAll("#productTable tbody tr");
+
+            rows.forEach((row, index) => {
+                const quantity = parseInt(row.querySelector(".quantity-input").value) || 0;
+                const weight = products[index].Weight;
+                const fullPallet = products[index].FullPallet;
+                const rowWeight = quantity * weight;
+
+                totalWeight += rowWeight;
+                totalCases += quantity;
+
+                const pallets = quantity / fullPallet;
+                row.querySelector("td:last-child").textContent = pallets.toFixed(2);
+
+                totalPallets += pallets;
+            });
+
+            const palletSelect = document.getElementById("palletSelect");
+            const palletType = palletSelect.value;
+
+            if (palletType === "chep") {
+                totalWeight += totalPallets * 50; // 50 lbs per CHEP pallet
+            } else if (palletType === "regular") {
+                totalWeight += totalPallets * 30; // 30 lbs per regular pallet
+            }
+
+            document.getElementById("totalWeight").textContent = totalWeight.toFixed(2);
+            document.getElementById("totalCases").textContent = totalCases;
+            document.getElementById("numPallets").textContent = totalPallets.toFixed(2);
+            document.getElementById("totalKilograms").textContent = (totalWeight * 0.453592).toFixed(2);
+        }
+
+        document.getElementById("clearQuantities").addEventListener("click", () => {
+            const inputs = document.querySelectorAll(".quantity-input");
+            inputs.forEach(input => {
+                input.value = 0;
+            });
+            calculateTotals();
+        });
+
+        document.getElementById("palletSelect").addEventListener("change", calculateTotals);
+
+        renderTable();
+        calculateTotals();
+    </script>
+</body>
+</html>
